@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Клікер з валютою</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        header {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #00ff9d;
+        }
+
+        .currency-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 20px 0;
+            text-align: center;
+            padding: 15px 30px;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: #00ff9d;
+        }
+
+        .clicker {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background-color: #00ff9d;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s;
+            user-select: none;
+        }
+
+        .clicker:active {
+            transform: scale(0.95);
+        }
+
+        .clicker-text {
+            font-size: 1.5rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 800px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            flex: 1;
+            margin: 0 10px;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-title {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00ff9d;
+        }
+
+        .upgrades {
+            width: 100%;
+            max-width: 800px;
+            margin-top: 30px;
+        }
+
+        .upgrade-title {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            color: #00ff9d;
+        }
+
+        .upgrade-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .upgrade-info {
+            flex: 2;
+        }
+
+        .upgrade-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .upgrade-description {
+            font-size: 0.9rem;
+            color: #333;
+            opacity: 0.8;
+        }
+
+        .upgrade-cost {
+            flex: 1;
+            text-align: right;
+            font-weight: bold;
+            color: #00ff9d;
+        }
+
+        .buy-btn {
+            padding: 8px 15px;
+            background-color: #00ff9d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .buy-btn:hover {
+            background-color: #6b8cbc;
+        }
+
+        .buy-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Клікер з валютою</h1>
+    </header>
+
+    <div class="currency-display" id="currency">0 монет</div>
+
+    <div class="clicker" id="clicker">
+        <div class="clicker-text">КЛІК!</div>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-title">Кліків в секунду</div>
+            <div class="stat-value" id="cps">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">Кліків всього</div>
+            <div class="stat-value" id="total-clicks">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">Монет в секунду</div>
+            <div class="stat-value" id="coins-per-second">0</div>
+        </div>
+    </div>
+
+    <div class="upgrades">
+        <div class="upgrade-title">Покращення</div>
+        <div class="upgrade-item">
+            <div class="upgrade-info">
+                <div class="upgrade-name">Покращений клік</div>
+                <div class="upgrade-description">Збільшує кількість монет за клік</div>
+            </div>
+            <div class="upgrade-cost" id="click-upgrade-cost">50 монет</div>
+            <button class="buy-btn" id="buy-click-upgrade">Купити</button>
+        </div>
+        <div class="upgrade-item">
+            <div class="upgrade-info">
+                <div class="upgrade-name">Автоклікер</div>
+                <div class="upgrade-description">Автоматично генерує монети</div>
+            </div>
+            <div class="upgrade-cost" id="auto-clicker-cost">100 монет</div>
+            <button class="buy-btn" id="buy-auto-clicker">Купити</button>
+        </div>
+        <div class="upgrade-item">
+            <div class="upgrade-info">
+                <div class="upgrade-name">Мультиплікатор доходу</div>
+                <div class="upgrade-description">Збільшує дохід від усіх джерел</div>
+            </div>
+            <div class="upgrade-cost" id="multiplier-cost">200 монет</div>
+            <button class="buy-btn" id="buy-multiplier">Купити</button>
+        </div>
+    </div>
+
+
+    <script>        // Ігровий стан                                                                     
+        const gameState = {
+            coins: 0,
+            totalClicks: 0,
+            coinsPerClick: 1,
+            coinsPerSecond: 0,
+            clickUpgradeLevel: 0,
+            autoClickerLevel: 0,
+            multiplierLevel: 0
+        };
+
+        // Стоимость улучшений
+        const upgradeCosts = {
+            click: 50,
+            autoClicker: 100,
+            multiplier: 200
+        };
+
+        // Элементы DOM
+        const currencyElement = document.getElementById('currency');
+        const clickerElement = document.getElementById('clicker');
+        const cpsElement = document.getElementById('cps');
+        const totalClicksElement = document.getElementById('total-clicks');
+        const coinsPerSecondElement = document.getElementById('coins-per-second');
+        const clickUpgradeCostElement = document.getElementById('click-upgrade-cost');
+        const autoClickerCostElement = document.getElementById('auto-clicker-cost');
+        const multiplierCostElement = document.getElementById('multiplier-cost');
+        const buyClickUpgradeButton = document.getElementById('buy-click-upgrade');
+        const buyAutoClickerButton = document.getElementById('buy-auto-clicker');
+        const buyMultiplierButton = document.getElementById('buy-multiplier');
+
+        // Обработчик клика
+        clickerElement.addEventListener('click', function() {
+            gameState.coins += gameState.coinsPerClick;
+            gameState.totalClicks++;
+            updateUI();
+        });
+
+        // Покупка улучшений
+        buyClickUpgradeButton.addEventListener('click', function() {
+            if (gameState.coins >= upgradeCosts.click) {
+                gameState.coins -= upgradeCosts.click;
+                gameState.clickUpgradeLevel++;
+                gameState.coinsPerClick = Math.floor(1 + gameState.clickUpgradeLevel * 0.5);
+                upgradeCosts.click = Math.floor(upgradeCosts.click * 1.5);
+                updateUI();
+            }
+        });
+
+        buyAutoClickerButton.addEventListener('click', function() {
+            if (gameState.coins >= upgradeCosts.autoClicker) {
+                gameState.coins -= upgradeCosts.autoClicker;
+                gameState.autoClickerLevel++;
+                gameState.coinsPerSecond = gameState.autoClickerLevel * 0.5;
+                upgradeCosts.autoClicker = Math.floor(upgradeCosts.autoClicker * 1.5);
+                updateUI();
+            }
+        });
+
+        buyMultiplierButton.addEventListener('click', function() {
+            if (gameState.coins >= upgradeCosts.multiplier) {
+                gameState.coins -= upgradeCosts.multiplier;
+                gameState.multiplierLevel++;
+                const multiplier = 1 + gameState.multiplierLevel * 0.1;
+                gameState.coinsPerClick = Math.floor((1 + gameState.clickUpgradeLevel * 0.5) * multiplier);
+                gameState.coinsPerSecond = gameState.autoClickerLevel * 0.5 * multiplier;
+                upgradeCosts.multiplier = Math.floor(upgradeCosts.multiplier * 1.5);
+                updateUI();
+            }
+        });
+
+        // Обновление интерфейса
+        function updateUI() {
+            currencyElement.textContent = `${Math.floor(gameState.coins)} монет`;
+            cpsElement.textContent = gameState.totalClicks;
+            totalClicksElement.textContent = gameState.totalClicks;
+            coinsPerSecondElement.textContent = gameState.coinsPerSecond.toFixed(1);
+            
+            clickUpgradeCostElement.textContent = `${upgradeCosts.click} монет`;
+            autoClickerCostElement.textContent = `${upgradeCosts.autoClicker} монет`;
+            multiplierCostElement.textContent = `${upgradeCosts.multiplier} монет`;
+            
+            // Обновление состояния кнопок
+            buyClickUpgradeButton.disabled = gameState.coins < upgradeCosts.click;
+            buyAutoClickerButton.disabled = gameState.coins < upgradeCosts.autoClicker;
+            buyMultiplierButton.disabled = gameState.coins < upgradeCosts.multiplier;
+        }
+
+        // Автоматическое начисление монет
+        setInterval(function() {
+            gameState.coins += gameState.coinsPerSecond / 10;
+            updateUI();
+        }, 100);
+
+        // Загрузка сохраненной игры
+        function loadGame() {
+            const savedGame = localStorage.getItem('clickerGame');
+            if (savedGame) {
+                const parsed = JSON.parse(savedGame);
+                Object.assign(gameState, parsed);
+            }
+        }
+
+        // Сохранение игры
+        function saveGame() {
+            localStorage.setItem('clickerGame', JSON.stringify(gameState));
+        }
+
+        // Автосохранение каждые 10 секунд
+        setInterval(saveGame, 10000);
+
+        // Инициализация игры
+        function initGame() {
+            loadGame();
+            updateUI();
+        }
+
+        // Запуск игры
+        initGame();
+    </script>
+</body>
+</html>
